@@ -1,0 +1,39 @@
+version: '3'
+
+volumes:
+  # for persistence between restarts
+  mysql_data:
+
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bookbase
+      MYSQL_USER: zab
+      MYSQL_PASSWORD: zab
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    environment:
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: >
+      yarn start:dev
