@@ -3,20 +3,17 @@ import { execOrderBy } from '../../util';
 import { execWhere } from '../../util/where';
 
 export const create = async data => {
-  const [book] = await query(
+  await query(
     `
     INSERT INTO books
     SET ?
   `,
-    [
-      {
-        image: 1,
-        ...data,
-        date: new Date(data.date),
-      },
-    ],
+    {
+      ...data,
+      date: new Date(data.date),
+    },
   );
-  return book;
+  return;
 };
 
 export const show = async id => {
