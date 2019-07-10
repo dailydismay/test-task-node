@@ -6,8 +6,10 @@ volumes:
 
 services:
   mysql:
-    image: mysql:latest
+    build: ./mysql
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
+    add: ./init.sql /docker-entrypoint-initdb.d
     ports:
       - '3306:3306'
     environment:
