@@ -1,17 +1,13 @@
 import { query } from '../src/db';
 import { makeImage, makeAuthor, makeBook } from './data';
-import { AuthorsQueue } from './authorQueue';
 
-const seedBooksNum = 1e5;
 const seedAuthorsNum = 2e3;
-const delimiter = seedBooksNum / seedAuthorsNum;
-
-const authorQueue = new AuthorsQueue(delimiter);
+const seedBooksNum = 1e5;
 
 const seedAuthors = async () => {
   for (let i = 0; i < seedAuthorsNum; i += 1) {
     const fakeAuthor = makeAuthor();
-    const { insertId } = await query(
+    await query(
       `
         INSERT INTO authors(
           fullname
@@ -19,9 +15,6 @@ const seedAuthors = async () => {
       `,
       fakeAuthor,
     );
-
-    authorQueue.add(insertId);
-    console.log(fakeAuthor);
   }
 };
 
@@ -47,13 +40,9 @@ const seedBooks = async () => {
           date,
           author,
           image
-        ) VALUES (?)
+        ) VALUES (?, ?, ?, ?, ?)
       `,
-      {
-        ...fakeBook,
-        author: authorQueue.currentAuthor,
-        image,
-      },
+      [...fakeBook, Math.floor(Math.random() * seedAuthorsNum), image],
     );
   }
 };
