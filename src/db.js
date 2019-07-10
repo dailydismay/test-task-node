@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import mysql from 'mysql';
-import { makePromisedQuery, makePromisedPrepare } from './util';
+import { makePromisedQuery } from './util';
 import { join } from 'path';
 
 const { db } = JSON.parse(
