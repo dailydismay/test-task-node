@@ -24,7 +24,7 @@ booksRouter
   .post('/', validationMiddleware(createBookSchema, 'body'), createBook)
   .put(
     '/:id',
-    validationMiddleware(requestIdParamSchema, 'id'),
+    validationMiddleware(requestIdParamSchema, 'params'),
     validationMiddleware(updateBookSchema, 'body'),
     updateBook,
   );
