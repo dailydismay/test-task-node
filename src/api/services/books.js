@@ -2,6 +2,8 @@ import { query } from '../../db';
 import { execOrderBy } from '../../util';
 import { execWhere } from '../../util/where';
 
+import * as redisClient from '../../redis';
+
 export const create = async data => {
   await query(
     `
@@ -13,20 +15,26 @@ export const create = async data => {
       date: new Date(data.date),
     },
   );
-  return;
 };
 
 export const show = async id => {
-  const [book] = await query(
-    `
-    SELECT * FROM books book
-    LEFT JOIN images image ON image.id = book.image
-    LEFT JOIN authors author ON author.id = book.author
-    WHERE book.id = ?
-  `,
-    [id],
-  );
-  return book;
+  const data = await redisClient.get(`book:${id}`);
+
+  if (!data) {
+    const [book] = await query(
+      `
+      SELECT * FROM books book
+      LEFT JOIN images image ON image.id = book.image
+      LEFT JOIN authors author ON author.id = book.author
+      WHERE book.id = ?
+    `,
+      [id],
+    );
+    await redisClient.set(`book:${id}`, JSON.stringify(book));
+    return book;
+  }
+
+  return data;
 };
 
 export const list = async ({
@@ -59,5 +67,5 @@ export const update = async (bookId, data) => {
   `,
     [data, bookId],
   );
-  return;
+  await redisClient.del(`book:${bookId}`);
 };
